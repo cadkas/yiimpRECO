@@ -1,0 +1,1 @@
+/etc/yamp/serverconfig.php
