@@ -18,12 +18,15 @@ static void job_pack_tx(YAAMP_COIND *coind, char *data, json_int_t amount, char 
 {
 	int ol = strlen(data);
 	char evalue[32];
-	encode_tx_value(evalue, amount);
+
+        encode_tx_value(evalue, amount);
 
 	sprintf(data+strlen(data), "%s", evalue);
 
+        debuglog("evalue %s\n", evalue);
+
         if(strcmp(coind->symbol, "RECO") == 0) {
-            sprintf(data+strlen(data), "000000");//Reference line
+            sprintf(data+strlen(data), "00");//Reference line
         }
 
 	if(coind->pos && !key)
@@ -33,8 +36,8 @@ static void job_pack_tx(YAAMP_COIND *coind, char *data, json_int_t amount, char 
 		sprintf(data+strlen(data), "1976a914%s88ac", key? key: coind->script_pubkey);
 
         if(strcmp(coind->symbol, "RECO") == 0) {
-            sprintf(data+strlen(data), "000000");//senderPubKey
-            sprintf(data+strlen(data), "000000");//receiverPubKey
+            sprintf(data+strlen(data), "00");//senderPubKey
+            sprintf(data+strlen(data), "00");//receiverPubKey
         }
 
 //	debuglog("pack tx %s\n", data+ol);
@@ -93,8 +96,9 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	if(!coind->pos && !coind->isaux && templ->auxs_size)
 		coinbase_aux(templ, script2);
 
-	int script_len = strlen(script1)/2 + strlen(script2)/2 + 8;
-	sprintf(templ->coinb1, "%s%s01"
+        int script_len = strlen(script1)/2 + strlen(script2)/2 + 8;
+        
+        sprintf(templ->coinb1, "%s%s01"
 		"0000000000000000000000000000000000000000000000000000000000000000"
 		"ffffffff%02x%s", eversion1, entime, script_len, script1);
 

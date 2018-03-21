@@ -177,10 +177,6 @@ void coind_init(YAAMP_COIND *coind)
 		//sprintf(account, "default");
 	}
 
-        if(strcmp(coind->symbol, "RECO") == 0) {
-                coind->usegetwork = true;
-        }
-
 
 	bool valid = coind_validate_address(coind);
 	if(valid) return;
