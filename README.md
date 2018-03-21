@@ -2,8 +2,8 @@ This is a fix for yiimp to work with the cryptocurrency "Reference line coin" / 
 www.referencecoin.co
 
 Important:
-In the coin configuration for RECO in the tabsheer Daemon you need to enter "DCR" in 
-the field "RPC Type". This will activate getwork and disable getblocktemplate.
+In the coin configuration for RECO in the tabsheer Settings you need to deactivate
+the "Txmessage" checkbox. In the tabsheet Daemon you enter "POW" for the RPC Type.
 
 
 You need to 
