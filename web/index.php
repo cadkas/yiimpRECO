@@ -1,18 +1,25 @@
 <?php
 
-//define('YII_DEBUG', true);
+define('YII_DEBUG', true);
 
 require_once('serverconfig.php');
+require_once('yaamp/defaultconfig.php');
 require_once('yaamp/ui/app.php');
-
-if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-	$_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
 
 //$_SERVER['PATH_INFO'] = $_SERVER['REQUEST_URI'];
 
-if(0)
-{
-	debuglog("{$_SERVER['REMOTE_ADDR']}, {$_SERVER['REQUEST_URI']}");
+// blacklist some search bots which ignore robots.txt (most in fact)
+$isbot = false; $agent = arraySafeVal($_SERVER,'HTTP_USER_AGENT','');
+if (strpos($agent, 'MJ12bot') || strpos($agent, 'DotBot') || strpos($agent, 'robot'))
+	$isbot = true;
+else if (strpos($agent, 'AhrefsBot') || strpos($agent, 'YandexBot') || strpos($agent, 'Googlebot'))
+	$isbot = true;
+
+if ($isbot) {
+	$url = arraySafeVal($_SERVER,'REQUEST_URI');
+	if (strpos($url, "explorer"))
+		throw new CHttpException(403,"You are not wanted on this server. see robots.txt");
+	die();
 }
 
 try
@@ -22,13 +29,14 @@ try
 
 catch(CException $e)
 {
+//	Javascript("alert($e->getMessage())");
 //	Javascript("window.history.go(-1)");
-//	mydump($e, 3);
+	mydump($e, 3);
 
 	debuglog("front end error ".$_SERVER['REMOTE_ADDR']);
 	debuglog($e->getMessage());
 
-//	send_email_alert('frontend', "frontend error", "a frontend error occured");
+//	send_email_alert('frontend', "frontend error", "
 }
 
-
+?>

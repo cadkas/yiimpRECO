@@ -65,13 +65,7 @@ function BackendCoinPayments($coin)
 			while($user->balance > $min_payout && $amount > $min_payout)
 			{
 				debuglog("$coin->symbol sendtoaddress $user->username $amount");
-        if($coin->symbol == 'RECO')
-        {
-            $tx = $remote->sendtoaddress($user->username, round($amount, 8),"Payout from mining pool");
-        }else
-        { 
-				    $tx = $remote->sendtoaddress($user->username, round($amount, 8));
-        }
+				$tx = $remote->sendtoaddress($user->username, round($amount, 8));
 				if(!$tx)
 				{
 					$error = $remote->error;
@@ -198,10 +192,16 @@ function BackendCoinPayments($coin)
 	// default account
 	$account = $coin->account;
 
-	if (!$coin->txmessage)
-		$tx = $remote->sendmany($account, $addresses);
-	else
-		$tx = $remote->sendmany($account, $addresses, 1, YAAMP_SITE_NAME);
+  if ($coin->symbol == 'BREC' || $coin->symbol == 'RECO')
+  {
+      $tx = $remote->sendmany($account, $addresses,"Payout from mining pool");
+  } else
+  {
+  	if (!$coin->txmessage)
+	  	$tx = $remote->sendmany($account, $addresses);
+	  else
+  		$tx = $remote->sendmany($account, $addresses, 1, YAAMP_SITE_NAME);
+  }
 
 	$errmsg = NULL;
 	if(!$tx) {
@@ -291,10 +291,18 @@ function BackendCoinPayments($coin)
 	// redo failed payouts
 	if (!empty($addresses))
 	{
-		if (!$coin->txmessage)
-			$tx = $remote->sendmany($account, $addresses);
-		else
-			$tx = $remote->sendmany($account, $addresses, 1, YAAMP_SITE_NAME." retry");
+  
+    if ($coin->symbol == 'BREC' || $coin->symbol == 'RECO')
+    {
+        $tx = $remote->sendmany($account, $addresses,"Payout from mining pool");        
+    } else
+    {
+  
+  		if (!$coin->txmessage)
+	  		$tx = $remote->sendmany($account, $addresses);
+  		else
+	  		$tx = $remote->sendmany($account, $addresses, 1, YAAMP_SITE_NAME." retry");
+    }
 
 		if(empty($tx)) {
 			debuglog($remote->error);

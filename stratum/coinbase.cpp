@@ -39,6 +39,11 @@ static void job_pack_tx(YAAMP_COIND *coind, char *data, json_int_t amount, char 
             sprintf(data+strlen(data), "00");//senderPubKey
             sprintf(data+strlen(data), "00");//receiverPubKey
         }
+        if(strcmp(coind->symbol, "BREC") == 0) {
+            sprintf(data+strlen(data), "00");//Reference line
+            sprintf(data+strlen(data), "00");//senderPubKey
+            sprintf(data+strlen(data), "00");//receiverPubKey
+        }
 
 //	debuglog("pack tx %s\n", data+ol);
 //	debuglog("pack tx %lld\n", amount);
@@ -87,6 +92,13 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	char eversion1[32] = "01000000";
 	if(coind->txmessage)
 		strcpy(eversion1, "02000000");
+    
+  if(strcmp(coind->symbol, "BREC") == 0) {
+    strcpy(eversion1, "03000000");
+    /*if (templ->has_segwit_txs)
+    strcpy(entime, "0001");*/
+    
+  }
 
 	char script1[4*1024];
 	sprintf(script1, "%s%s%s08", eheight, templ->flags, etime);
@@ -495,6 +507,9 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	else if (templ->has_segwit_txs) {
 		strcat(templ->coinb2, "02");
 		strcat(templ->coinb2, commitment);
+    if(strcmp(coind->symbol, "BREC") == 0) {
+        strcat(templ->coinb2, "000000");//add refline, sender and receiver pubkey
+    }
 	} else {
 		strcat(templ->coinb2, "01");
 	}
@@ -504,6 +519,10 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	//if(coind->txmessage)
 	//	strcat(templ->coinb2, "00");
 
+    /*if(strcmp(coind->symbol, "BREC") == 0 && templ->has_segwit_txs) {
+        strcat(templ->coinb2, "01200000000000000000000000000000000000000000000000000000000000000000");//add witness data
+    } */ 
+  
 	strcat(templ->coinb2, "00000000"); // locktime
 
 	coind->reward = (double)available/100000000*coind->reward_mul;

@@ -136,7 +136,7 @@ bool coind_validate_address(YAAMP_COIND *coind)
 	const char *acc = json_get_string(json_result, "account");
 	if (acc) strcpy(coind->account, acc);
 
-        if(strcmp(coind->symbol, "RECO") == 0) {
+        if(strcmp(coind->symbol, "RECO") == 0 || strcmp(coind->symbol, "BREC") == 0) {
 	    if (!base58_decodeRECO(coind->wallet, coind->script_pubkey))
 		stratumlog("Warning: unable to decode %s %s script pubkey\n", coind->symbol, coind->wallet);
         }else
